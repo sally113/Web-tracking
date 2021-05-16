@@ -1,0 +1,58 @@
+
+##網頁瀏覽行為追蹤 
+#2021/05/16 整理randomForest分析流程。程式參考資料來源：Day26 R語言機器學習之決策樹與隨機森林
+
+library(readxl)
+library(randomForest)
+
+#匯入資料
+track0315 <- read_excel("C:\TransData_0315Tree.xlsx")
+
+track0315$Y <- as.factor(track0315$Y)
+# 先把資料區分成 train=0.7, test=0.3 
+set.seed(2021)
+train.index <- sample(x=1:nrow(track0315), size=ceiling(0.7*nrow(track0315) ))
+train <- track0315[train.index, ]
+test <- track0315[-train.index, ]
+
+#將Y型別改成factor，才能進行分類演算法
+train$Y <- as.factor(train$Y)
+
+#隨機森林模型
+randomforestM <- randomForest(Y ~ .,data=train, importane = T, proximity = T, do.trace = 100)
+randomforestM 
+
+#錯誤率: 利用OOB(Out Of Bag)運算出來的
+plot(randomforestM)
+
+#對測試資料進行預測
+#用newdata
+track0315.pred <- predict(randomforestM, newdata=test)
+track0315.pred
+
+
+# 用table看預測的情況
+# table(real=test$Y, predict=track0315.pred)
+# 建立混淆矩陣(confusion matrix)觀察模型表現
+cm <- table(observed=test$Y, predicted = track0315.pred)
+cm
+
+#正確率
+#預測結果=購買的正確率
+cm[4] / sum(cm[, 2])
+
+#預測結果=未購買的正確率
+cm[1] / sum(cm[, 1])
+
+#整體正確率(取出對角/總數)
+accuracy <- sum(diag(cm)) / sum(cm)
+accuracy
+
+##求得變數的重要性，並畫出重要性圖
+#importance(randomforestM)
+#衡量每一個變數對Y值的重要性，取到小數點第二位
+round(importance(randomforestM), 2)
+
+# sort: 是否按重要性降冪排列
+varImpPlot(randomforestM, sort = TRUE)
+varImpPlot
