@@ -1,0 +1,20 @@
+
+
+##網頁瀏覽行為追蹤 
+#2021/05/17 整理logistic regression分析流程。(Warning message:glm.fit: fitted probabilities numerically 0 or 1 occurred )
+library(readxl)
+
+#匯入資料
+track0315 <- read_excel("C:\TransData_0315Tree.xlsx")
+
+#資料類型轉換
+track0315$Y <-as.numeric(track0315$Y)
+track0315$Cart <-as.numeric(track0315$Cart)
+
+# 先把資料區分成 train=0.7, test=0.3 
+set.seed(2021)
+train.index <- sample(x=1:nrow(track0315), size=ceiling(0.7*nrow(track0315) ))
+train <- track0315[train.index, ]
+test <- track0315[-train.index, ]
+
+model <- glm(Y~ .,family = 'binomial',data=train) #失敗
