@@ -1,0 +1,19 @@
+
+
+
+##網頁瀏覽行為追蹤 
+#2021/05/18 整理Sequential Pattern Mining分析流程。參考[R] 資料科學-序列樣式探勘分析(Sequential Pattern Mining)
+
+library(arulesSequences)
+
+#匯入資料
+#讀txt檔，以sep="," 分隔，前兩個欄位定義成"sequenceID", "eventID"
+trackdata=read_baskets("C:\trackdata2.txt",sep=",",info=c("sequenceID", "eventID"))     
+
+#建模型，使用支持度0.4 (最小支持度：篩選出至少40%的人共有的樣式) 
+trackdata_0.4=cspade(trackdata,parameter=list(supp=0.4),control=list(verbose=T),tmpdir=tempdir())  
+
+summary(trackdata_0.4)
+
+#將trackdata_0.4轉換成data.frame
+trackdata_0.4 <- as(trackdata_0.4,"data.frame") 
