@@ -1,0 +1,41 @@
+
+
+##網頁瀏覽行為追蹤 
+#2021/05/24 整理decision tree分析流程。程式參考資料來源：R_programming - (8)決策樹(Decision Tree)
+
+library(readxl)
+library(rpart) #決策樹
+library(partykit) #as.party函數 # 轉換cart決策樹決策樹圖
+
+#匯入資料
+track0315 <- read_excel("C:\\Sally\\2.個人經歷\\3.作品附件\\BSP論文\\0.資料\\會員網頁瀏覽統計_TransData_0315Tree.xlsx")
+
+
+# 先把資料區分成 train=0.7, test=0.3 
+set.seed(2021)
+train.index <- sample(x=1:nrow(track0315), size=ceiling(0.7*nrow(track0315) ))
+train <- track0315[train.index, ]
+test <- track0315[-train.index, ]
+
+
+# CART的模型：把購買與否的變數(Survived)當作Y，剩下的變數當作X
+cart.model<- rpart(Y~. , data=train)
+# 輸出各節點的細部資訊(呈現在console視窗)
+cart.model
+
+
+rparty.tree <- as.party(cart.model) # 轉換cart決策樹
+rparty.tree # 輸出各節點的細部資訊
+rparty.tree
+plot(rparty.tree) 
+
+
+pred <- predict(cart.model, newdata=test, type="class")
+
+# 用table看預測的情況
+table(real=test$Y, predict=pred)
+
+# 計算預測準確率 = 對角線的數量/總數量
+confus.matrix <- table(real=test$Y, predict=pred)
+sum(diag(confus.matrix))/sum(confus.matrix) # 對角線的數量/總數量
+
