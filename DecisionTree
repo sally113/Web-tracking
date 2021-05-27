@@ -8,7 +8,7 @@ library(rpart) #決策樹
 library(partykit) #as.party函數 # 轉換cart決策樹決策樹圖
 
 #匯入資料
-track0315 <- read_excel("C:\\Sally\\2.個人經歷\\3.作品附件\\BSP論文\\0.資料\\會員網頁瀏覽統計_TransData_0315Tree.xlsx")
+track0315 <- read_excel("C:\\會員網頁瀏覽統計_TransData_0315Tree.xlsx")
 
 
 # 先把資料區分成 train=0.7, test=0.3 
