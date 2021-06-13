@@ -1,11 +1,11 @@
 
 
-##網頁瀏覽行為追蹤 
+##網頁瀏覽行為追蹤-logistic regression
 #2021/05/17 整理logistic regression分析流程。(Warning message:glm.fit: fitted probabilities numerically 0 or 1 occurred )
 library(readxl)
 
-#匯入資料
-track0315 <- read_excel("C:\TransData_0315Tree.xlsx")
+#匯入資料C:\Sally\2.個人經歷\3.作品附件\BSP論文\0.資料
+track0315 <- read_excel("C:\\TransData_0315Tree.xlsx")
 
 #資料類型轉換
 track0315$Y <-as.numeric(track0315$Y)
@@ -13,8 +13,32 @@ track0315$Cart <-as.numeric(track0315$Cart)
 
 # 先把資料區分成 train=0.7, test=0.3 
 set.seed(2021)
-train.index <- sample(x=1:nrow(track0315), size=ceiling(0.7*nrow(track0315) ))
+train.index <- sample(x=1:nrow(track0315), size=ceiling(0.7*nrow(track0315)))
 train <- track0315[train.index, ]
 test <- track0315[-train.index, ]
 
-model <- glm(Y~ .,family = 'binomial',data=train) #失敗
+model <- glm(Y ~ .,data=train,family = "binomial") #logistic regression
+model
+
+summary(model)
+
+p<-predict(model,type='response')
+
+result <- predict(model, newdata = test, type = "response")
+result_Approved <- ifelse(result > 0.5, 1, 0)
+
+# 用table看預測的情況
+cm <- table(result_Approved,test$Y, dnn = c("預測","實際"))
+cm
+
+#計算敏感度(代表模型中實際為正且被正確預測的比率)
+cm[4] / sum(cm[, 2])
+
+#計算特異性(代表模型中實際為負且被正確預測的比率。)
+cm[1] / sum(cm[, 1])
+
+#整體準確率(對角線元素總和/所有觀察值總和)
+accuracy <- sum(diag(cm)) / sum(cm)
+accuracy
+
+  
